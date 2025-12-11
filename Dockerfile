@@ -15,7 +15,10 @@ COPY . .
 
 ENV CGO_ENABLED=1
 ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
-RUN go build -ldflags "-w -s" -o build/x-ui main.go
+# 设置 Go proxy 以提高下载成功率
+ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOSUMDB=sum.golang.org
+RUN go build -ldflags "-w -s" -o build/web-admin main.go
 RUN ./DockerInit.sh "$TARGETARCH"
 
 # ========================================================
@@ -45,11 +48,12 @@ RUN rm -f /etc/fail2ban/jail.d/alpine-ssh.conf \
 
 RUN chmod +x \
   /app/DockerEntrypoint.sh \
-  /app/x-ui \
-  /usr/bin/x-ui
+  /app/web-admin \
+  /usr/bin/x-ui && \
+  chmod +x /app/bin/sys-core-linux-* 2>/dev/null || true
 
 ENV XUI_ENABLE_FAIL2BAN="true"
 EXPOSE 2053
-VOLUME [ "/etc/x-ui" ]
-CMD [ "./x-ui" ]
+VOLUME [ "/etc/web-admin" ]
+CMD [ "./web-admin" ]
 ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]

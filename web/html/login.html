@@ -4,8 +4,8 @@
 {{ template "page/body_start" .}}
 <a-layout id="app" v-cloak :class="themeSwitcher.currentTheme + ' login-app'">
   <transition name="list" appear>
-    <a-layout-content class="under min-h-0">
-      <div class="waves-header">
+      <a-layout-content class="under min-h-0" style="background: linear-gradient(135deg, #e6f3ff 0%, #b3d9ff 50%, #87ceeb 100%);">
+      <div class="waves-header" style="background-color: #e6f3ff;">
         <div class="waves-inner-header"></div>
         <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
           viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
@@ -13,10 +13,10 @@
             <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
           </defs>
           <g class="parallax">
-            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(0, 135, 113, 0.08)" />
-            <use xlink:href="#gentle-wave" x="48" y="7" fill="#c7ebe2" />
+            <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(64, 169, 255, 0.1)" />
+            <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(100, 200, 255, 0.15)" />
+            <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(135, 206, 250, 0.2)" />
+            <use xlink:href="#gentle-wave" x="48" y="7" fill="#e6f3ff" />
           </g>
         </svg>
       </div>
@@ -51,8 +51,8 @@
               <a-col :style="{ width: '100%' }">
                 <h2 class="title headline zoom">
                   <span class="words-wrapper">
-                    <b class="is-visible">{{ i18n "pages.login.hello" }}</b>
-                    <b>{{ i18n "pages.login.title" }}</b>
+                    <b class="is-visible">世界和平</b>
+                    <b>World Peace</b>
                   </span>
                 </h2>
               </a-col>

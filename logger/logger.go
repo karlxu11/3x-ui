@@ -15,7 +15,7 @@ import (
 
 const (
 	maxLogBufferSize = 10240                 // Maximum log entries kept in memory
-	logFileName      = "3xui.log"            // Log file name
+	logFileName      = "web-admin.log"        // Log file name
 	timeFormat       = "2006/01/02 15:04:05" // Log timestamp format
 )
 
@@ -34,20 +34,20 @@ var (
 // InitLogger initializes dual logging backends: console/syslog and file.
 // Console logging uses the specified level, file logging always uses DEBUG level.
 func InitLogger(level logging.Level) {
-	newLogger := logging.MustGetLogger("x-ui")
+	newLogger := logging.MustGetLogger("web-admin")
 	backends := make([]logging.Backend, 0, 2)
 
 	// Console/syslog backend with configurable level
 	if consoleBackend := initDefaultBackend(); consoleBackend != nil {
 		leveledBackend := logging.AddModuleLevel(consoleBackend)
-		leveledBackend.SetLevel(level, "x-ui")
+		leveledBackend.SetLevel(level, "web-admin")
 		backends = append(backends, leveledBackend)
 	}
 
 	// File backend with DEBUG level for comprehensive logging
 	if fileBackend := initFileBackend(); fileBackend != nil {
 		leveledBackend := logging.AddModuleLevel(fileBackend)
-		leveledBackend.SetLevel(logging.DEBUG, "x-ui")
+		leveledBackend.SetLevel(logging.DEBUG, "web-admin")
 		backends = append(backends, leveledBackend)
 	}
 

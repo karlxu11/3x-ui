@@ -18,57 +18,57 @@ import (
 	"github.com/mhsanaei/3x-ui/v2/util/common"
 )
 
-// GetBinaryName returns the Xray binary filename for the current OS and architecture.
+// GetBinaryName returns the binary filename for the current OS and architecture.
 func GetBinaryName() string {
-	return fmt.Sprintf("xray-%s-%s", runtime.GOOS, runtime.GOARCH)
+	return fmt.Sprintf("sys-core-%s-%s", runtime.GOOS, runtime.GOARCH)
 }
 
-// GetBinaryPath returns the full path to the Xray binary executable.
+// GetBinaryPath returns the full path to the core service binary executable.
 func GetBinaryPath() string {
 	return config.GetBinFolderPath() + "/" + GetBinaryName()
 }
 
-// GetConfigPath returns the path to the Xray configuration file in the binary folder.
+// GetConfigPath returns the path to the core service configuration file in the binary folder.
 func GetConfigPath() string {
 	return config.GetBinFolderPath() + "/config.json"
 }
 
-// GetGeositePath returns the path to the geosite data file used by Xray.
+// GetGeositePath returns the path to the geosite data file used by the core service.
 func GetGeositePath() string {
 	return config.GetBinFolderPath() + "/geosite.dat"
 }
 
-// GetGeoipPath returns the path to the geoip data file used by Xray.
+// GetGeoipPath returns the path to the geoip data file used by the core service.
 func GetGeoipPath() string {
 	return config.GetBinFolderPath() + "/geoip.dat"
 }
 
 // GetIPLimitLogPath returns the path to the IP limit log file.
 func GetIPLimitLogPath() string {
-	return config.GetLogFolder() + "/3xipl.log"
+	return config.GetLogFolder() + "/wa-ipl.log"
 }
 
 // GetIPLimitBannedLogPath returns the path to the banned IP log file.
 func GetIPLimitBannedLogPath() string {
-	return config.GetLogFolder() + "/3xipl-banned.log"
+	return config.GetLogFolder() + "/wa-ipl-banned.log"
 }
 
 // GetIPLimitBannedPrevLogPath returns the path to the previous banned IP log file.
 func GetIPLimitBannedPrevLogPath() string {
-	return config.GetLogFolder() + "/3xipl-banned.prev.log"
+	return config.GetLogFolder() + "/wa-ipl-banned.prev.log"
 }
 
 // GetAccessPersistentLogPath returns the path to the persistent access log file.
 func GetAccessPersistentLogPath() string {
-	return config.GetLogFolder() + "/3xipl-ap.log"
+	return config.GetLogFolder() + "/wa-ipl-ap.log"
 }
 
 // GetAccessPersistentPrevLogPath returns the path to the previous persistent access log file.
 func GetAccessPersistentPrevLogPath() string {
-	return config.GetLogFolder() + "/3xipl-ap.prev.log"
+	return config.GetLogFolder() + "/wa-ipl-ap.prev.log"
 }
 
-// GetAccessLogPath reads the Xray config and returns the access log file path.
+// GetAccessLogPath reads the core service config and returns the access log file path.
 func GetAccessLogPath() (string, error) {
 	config, err := os.ReadFile(GetConfigPath())
 	if err != nil {
@@ -98,12 +98,12 @@ func stopProcess(p *Process) {
 	p.Stop()
 }
 
-// Process wraps an Xray process instance and provides management methods.
+// Process wraps a core service process instance and provides management methods.
 type Process struct {
 	*process
 }
 
-// NewProcess creates a new Xray process and sets up cleanup on garbage collection.
+// NewProcess creates a new core service process and sets up cleanup on garbage collection.
 func NewProcess(xrayConfig *Config) *Process {
 	p := &Process{newProcess(xrayConfig)}
 	runtime.SetFinalizer(p, stopProcess)
@@ -124,7 +124,7 @@ type process struct {
 	startTime time.Time
 }
 
-// newProcess creates a new internal process struct for Xray.
+// newProcess creates a new internal process struct for the core service.
 func newProcess(config *Config) *process {
 	return &process{
 		version:   "Unknown",
@@ -134,7 +134,7 @@ func newProcess(config *Config) *process {
 	}
 }
 
-// IsRunning returns true if the Xray process is currently running.
+// IsRunning returns true if the core service process is currently running.
 func (p *process) IsRunning() bool {
 	if p.cmd == nil || p.cmd.Process == nil {
 		return false
@@ -145,12 +145,12 @@ func (p *process) IsRunning() bool {
 	return false
 }
 
-// GetErr returns the last error encountered by the Xray process.
+// GetErr returns the last error encountered by the core service process.
 func (p *process) GetErr() error {
 	return p.exitErr
 }
 
-// GetResult returns the last log line or error from the Xray process.
+// GetResult returns the last log line or error from the core service process.
 func (p *process) GetResult() string {
 	if len(p.logWriter.lastLine) == 0 && p.exitErr != nil {
 		return p.exitErr.Error()
@@ -158,32 +158,32 @@ func (p *process) GetResult() string {
 	return p.logWriter.lastLine
 }
 
-// GetVersion returns the version string of the Xray process.
+// GetVersion returns the version string of the core service process.
 func (p *process) GetVersion() string {
 	return p.version
 }
 
-// GetAPIPort returns the API port used by the Xray process.
+// GetAPIPort returns the API port used by the core service process.
 func (p *Process) GetAPIPort() int {
 	return p.apiPort
 }
 
-// GetConfig returns the configuration used by the Xray process.
+// GetConfig returns the configuration used by the core service process.
 func (p *Process) GetConfig() *Config {
 	return p.config
 }
 
-// GetOnlineClients returns the list of online clients for the Xray process.
+// GetOnlineClients returns the list of online clients for the core service process.
 func (p *Process) GetOnlineClients() []string {
 	return p.onlineClients
 }
 
-// SetOnlineClients sets the list of online clients for the Xray process.
+// SetOnlineClients sets the list of online clients for the core service process.
 func (p *Process) SetOnlineClients(users []string) {
 	p.onlineClients = users
 }
 
-// GetUptime returns the uptime of the Xray process in seconds.
+// GetUptime returns the uptime of the core service process in seconds.
 func (p *Process) GetUptime() uint64 {
 	return uint64(time.Since(p.startTime).Seconds())
 }
@@ -198,7 +198,7 @@ func (p *process) refreshAPIPort() {
 	}
 }
 
-// refreshVersion updates the version string by running the Xray binary with -version.
+// refreshVersion updates the version string by running the core service binary with -version.
 func (p *process) refreshVersion() {
 	cmd := exec.Command(GetBinaryPath(), "-version")
 	data, err := cmd.Output()
@@ -214,22 +214,22 @@ func (p *process) refreshVersion() {
 	}
 }
 
-// Start launches the Xray process with the current configuration.
+// Start launches the core service process with the current configuration.
 func (p *process) Start() (err error) {
 	if p.IsRunning() {
-		return errors.New("xray is already running")
+		return errors.New("core service is already running")
 	}
 
 	defer func() {
 		if err != nil {
-			logger.Error("Failure in running xray-core process: ", err)
+			logger.Error("Failure in running core service process: ", err)
 			p.exitErr = err
 		}
 	}()
 
 	data, err := json.MarshalIndent(p.config, "", "  ")
 	if err != nil {
-		return common.NewErrorf("Failed to generate XRAY configuration files: %v", err)
+		return common.NewErrorf("Failed to generate core service configuration files: %v", err)
 	}
 
 	err = os.MkdirAll(config.GetLogFolder(), 0o770)
@@ -261,7 +261,7 @@ func (p *process) Start() (err error) {
 					return
 				}
 			}
-			logger.Error("Failure in running xray-core:", err)
+			logger.Error("Failure in running core service:", err)
 			p.exitErr = err
 		}
 	}()
@@ -272,10 +272,10 @@ func (p *process) Start() (err error) {
 	return nil
 }
 
-// Stop terminates the running Xray process.
+// Stop terminates the running core service process.
 func (p *process) Stop() error {
 	if !p.IsRunning() {
-		return errors.New("xray is not running")
+		return errors.New("core service is not running")
 	}
 
 	if runtime.GOOS == "windows" {

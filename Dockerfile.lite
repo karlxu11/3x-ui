@@ -1,0 +1,43 @@
+# ========================================================
+# Stage: Builder (精简版)
+# ========================================================
+FROM golang:1.25-alpine AS builder
+WORKDIR /app
+ARG TARGETARCH
+
+# 只安装必要的构建工具
+RUN apk --no-cache add build-base gcc wget unzip
+
+COPY . .
+
+ENV CGO_ENABLED=1
+ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
+# 设置 Go proxy 以提高下载成功率
+ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOSUMDB=sum.golang.org
+RUN go build -ldflags "-w -s" -o build/web-admin main.go
+RUN ./DockerInit.sh "$TARGETARCH"
+
+# ========================================================
+# Stage: Final Image (精简版 - 移除fail2ban和bash)
+# ========================================================
+FROM alpine:latest
+ENV TZ=Asia/Tehran
+WORKDIR /app
+
+# 只安装运行时必需的最小依赖
+RUN apk add --no-cache ca-certificates tzdata && \
+    rm -rf /var/cache/apk/*
+
+COPY --from=builder /app/build/ /app/
+COPY DockerEntrypoint.lite.sh /app/DockerEntrypoint.sh
+
+# 只设置必要的执行权限
+RUN chmod +x /app/DockerEntrypoint.sh /app/web-admin && \
+    chmod +x /app/bin/sys-core-linux-* 2>/dev/null || true
+
+EXPOSE 2053
+VOLUME [ "/etc/web-admin" ]
+CMD [ "./web-admin" ]
+ENTRYPOINT [ "/app/DockerEntrypoint.sh" ]
+

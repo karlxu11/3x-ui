@@ -8,17 +8,17 @@ import (
 	"github.com/mhsanaei/3x-ui/v2/logger"
 )
 
-// NewLogWriter returns a new LogWriter for processing Xray log output.
+// NewLogWriter returns a new LogWriter for processing core service log output.
 func NewLogWriter() *LogWriter {
 	return &LogWriter{}
 }
 
-// LogWriter processes and filters log output from the Xray process, handling crash detection and message filtering.
+// LogWriter processes and filters log output from the core service process, handling crash detection and message filtering.
 type LogWriter struct {
 	lastLine string
 }
 
-// Write processes and filters log output from the Xray process, handling crash detection and message filtering.
+// Write processes and filters log output from the core service process, handling crash detection and message filtering.
 func (lw *LogWriter) Write(m []byte) (n int, err error) {
 	crashRegex := regexp.MustCompile(`(?i)(panic|exception|stack trace|fatal error)`)
 
@@ -55,25 +55,25 @@ func (lw *LogWriter) Write(m []byte) (n int, err error) {
 
 			if strings.Contains(msgBodyLower, "tls handshake error") ||
 				strings.Contains(msgBodyLower, "connection ends") {
-				logger.Debug("XRAY: " + msgBody)
+				logger.Debug("CORE: " + msgBody)
 				lw.lastLine = ""
 				continue
 			}
 
 			if strings.Contains(msgBodyLower, "failed") {
-				logger.Error("XRAY: " + msgBody)
+				logger.Error("CORE: " + msgBody)
 			} else {
 				switch level {
 				case "Debug":
-					logger.Debug("XRAY: " + msgBody)
+					logger.Debug("CORE: " + msgBody)
 				case "Info":
-					logger.Info("XRAY: " + msgBody)
+					logger.Info("CORE: " + msgBody)
 				case "Warning":
-					logger.Warning("XRAY: " + msgBody)
+					logger.Warning("CORE: " + msgBody)
 				case "Error":
-					logger.Error("XRAY: " + msgBody)
+					logger.Error("CORE: " + msgBody)
 				default:
-					logger.Debug("XRAY: " + msg)
+					logger.Debug("CORE: " + msg)
 				}
 			}
 			lw.lastLine = ""
@@ -82,15 +82,15 @@ func (lw *LogWriter) Write(m []byte) (n int, err error) {
 
 			if strings.Contains(msgLower, "tls handshake error") ||
 				strings.Contains(msgLower, "connection ends") {
-				logger.Debug("XRAY: " + msg)
+				logger.Debug("CORE: " + msg)
 				lw.lastLine = msg
 				continue
 			}
 
 			if strings.Contains(msgLower, "failed") {
-				logger.Error("XRAY: " + msg)
+				logger.Error("CORE: " + msg)
 			} else {
-				logger.Debug("XRAY: " + msg)
+				logger.Debug("CORE: " + msg)
 			}
 			lw.lastLine = msg
 		}

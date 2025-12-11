@@ -79,12 +79,7 @@ type HistoryOfSeeders struct {
 
 // GenXrayInboundConfig generates an Xray inbound configuration from the Inbound model.
 func (i *Inbound) GenXrayInboundConfig() *xray.InboundConfig {
-	listen := i.Listen
-	if listen != "" {
-		listen = fmt.Sprintf("\"%v\"", listen)
-	}
-	return &xray.InboundConfig{
-		Listen:         json_util.RawMessage(listen),
+	config := &xray.InboundConfig{
 		Port:           i.Port,
 		Protocol:       string(i.Protocol),
 		Settings:       json_util.RawMessage(i.Settings),
@@ -92,6 +87,22 @@ func (i *Inbound) GenXrayInboundConfig() *xray.InboundConfig {
 		Tag:            i.Tag,
 		Sniffing:       json_util.RawMessage(i.Sniffing),
 	}
+	
+	// Set Listen field based on inbound configuration
+	// For container environments like Zeabur, explicitly set to "0.0.0.0" to ensure IPv4 listening
+	// This is necessary because listen: null may default to IPv6-only in some environments
+	listen := i.Listen
+	if listen == "" || listen == "0.0.0.0" || listen == "::" || listen == "::0" {
+		// Explicitly set to "0.0.0.0" to ensure IPv4 listening in container environments
+		// This is critical for platforms like Zeabur where IPv6-only binding may not work
+		config.Listen = json_util.RawMessage([]byte(`"0.0.0.0"`))
+	} else {
+		// Set to the specified listen address
+		listenJSON := fmt.Sprintf(`"%s"`, listen)
+		config.Listen = json_util.RawMessage(listenJSON)
+	}
+	
+	return config
 }
 
 // Setting stores key-value configuration settings for the 3x-ui panel.
